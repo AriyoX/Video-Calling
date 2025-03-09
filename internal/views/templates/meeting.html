@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Meeting - Video Conference</title>
+  <link rel="stylesheet" href="/static/css/styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+  <!-- Waiting Screen -->
+  <div id="waiting-screen" style="display: none;">
+    <div class="container">
+      <div class="form-container">
+        <h2>Waiting to join</h2>
+        <p>Please wait while the host admits you to the meeting.</p>
+        <div class="loading-indicator">
+          <i class="fas fa-spinner fa-spin"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Meeting Screen -->
+  <div id="meeting-screen">
+    <header>
+      <h1>Video Conference</h1>
+      <div class="meeting-info">
+        <span class="meeting-code">Meeting Code: {{ .MeetingCode }}</span>
+        <button id="copy-link-button" class="secondary">Copy Link</button>
+      </div>
+    </header>
+    
+    <div class="container meeting-container">
+      <!-- Waiting Room (visible only to host) -->
+      <div id="waiting-room-container" data-is-host="{{ .IsHost }}" style="display: none;">
+        <div id="waiting-room" class="waiting-room" data-has-waiting="{{ gt (len .WaitingRoom) 0 }}" style="display: none;">
+          <h3>Waiting Room (<span id="waiting-count">{{ len .WaitingRoom }}</span>)</h3>
+          <ul id="waiting-list" class="participant-list">
+            {{ range .WaitingRoom }}
+              <li class="participant-item">
+                <span>{{ .Name }}</span>
+                <div class="action-buttons">
+                  <button class="admit-button" data-id="{{ .ID }}">Admit</button>
+                  <button class="reject-button" data-id="{{ .ID }}">Reject</button>
+                </div>
+              </li>
+            {{ end }}
+          </ul>
+        </div>
+      </div>
+      
+      <!-- Participants list -->
+      <div class="participants-sidebar">
+        <h3>Participants</h3>
+        <ul id="participants-list">
+          {{ range .Participants }}
+            <li id="participant-{{ .ID }}">{{ .Name }}{{ if eq .ID $.HostID }} (Host){{ end }}</li>
+          {{ end }}
+        </ul>
+      </div>
+      
+      <!-- Video Grid -->
+      <div id="video-grid" class="video-grid">
+        <div class="video-container">
+          <video id="local-video" autoplay muted playsinline></video>
+          <div class="video-name">You</div>
+        </div>
+      </div>
+      
+      <!-- Chat Box -->
+      <div class="chat-container">
+        <div class="chat-header">
+          <h3>Chat</h3>
+        </div>
+        <div id="chat-messages" class="chat-messages"></div>
+        <div class="chat-input-container">
+          <input type="text" id="chat-input" placeholder="Type a message...">
+          <button id="send-button"><i class="fas fa-paper-plane"></i></button>
+        </div>
+      </div>
+      
+      <!-- Controls -->
+      <div class="controls">
+        <button id="mute-button" class="control-button"><i class="fas fa-microphone"></i></button>
+        <button id="video-button" class="control-button"><i class="fas fa-video"></i></button>
+        <button id="screen-button" class="control-button"><i class="fas fa-desktop"></i></button>
+        <button id="hangup-button" class="control-button"><i class="fas fa-phone-slash"></i></button>
+      </div>
+    </div>
+  </div>
+  
+  <script src="/static/js/webrtc.js"></script>
+  <script src="/static/js/app.js"></script>
+</body>
+</html>

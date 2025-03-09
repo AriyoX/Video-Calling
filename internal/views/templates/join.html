@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Join Meeting - Video Conference</title>
+  <link rel="stylesheet" href="/static/css/styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+  <header>
+    <h1>Video Conference App</h1>
+  </header>
+  
+  <div class="container">
+    <div class="form-container">
+      <h2>Join Meeting</h2>
+      <p>Meeting Code: <strong>{{ .MeetingCode }}</strong></p>
+      
+      <form id="join-form">
+        <div>
+          <label for="name">Your Name</label>
+          <input type="text" id="name" name="name" placeholder="Enter your name" required>
+        </div>
+        <button type="submit" class="primary">Join Meeting</button>
+      </form>
+      
+      <div class="back-link">
+        <a href="/">&larr; Back to Home</a>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    document.getElementById('join-form').addEventListener('submit', function(event) {
+      event.preventDefault();
+      
+      const name = document.getElementById('name').value.trim();
+      const meetingCode = '{{ .MeetingCode }}';
+      
+      if (name) {
+        // Store name in local storage for WebSocket connection
+        localStorage.setItem('participantName', name);
+        
+        // Generate a random participant ID
+        const participantId = generateRandomId();
+        
+        // Redirect to the meeting page with participant ID
+        window.location.href = `/meeting/${meetingCode}?participantId=${participantId}`;
+      }
+    });
+    
+    // Generate a random ID for the participant
+    function generateRandomId() {
+      return Array.from(crypto.getRandomValues(new Uint8Array(16)))
+        .map(b => b.toString(16).padStart(2, '0'))
+        .join('');
+    }
+  </script>
+</body>
+</html>
