@@ -39,22 +39,36 @@
       const meetingCode = '{{ .MeetingCode }}';
       
       if (name) {
-        // Store name in local storage for WebSocket connection
-        localStorage.setItem('participantName', name);
-        
-        // Generate a random participant ID
-        const participantId = generateRandomId();
-        
-        // Redirect to the meeting page with participant ID
-        window.location.href = `/meeting/${meetingCode}?participantId=${participantId}`;
+        try {
+          // Store name in local storage for WebSocket connection
+          localStorage.setItem('participantName', name);
+          
+          // Generate a random participant ID
+          const participantId = generateRandomId();
+          
+          console.log("Generated participant ID:", participantId);
+          console.log("Joining with name:", name);
+          
+          // Redirect to the meeting page with participant ID AND name
+          window.location.href = `/meeting/${meetingCode}?participantId=${participantId}&name=${encodeURIComponent(name)}`;
+        } catch (error) {
+          console.error("Error joining meeting:", error);
+          alert("There was an error joining the meeting. Please try again.");
+        }
       }
     });
     
     // Generate a random ID for the participant
     function generateRandomId() {
-      return Array.from(crypto.getRandomValues(new Uint8Array(16)))
-        .map(b => b.toString(16).padStart(2, '0'))
-        .join('');
+      try {
+        return Array.from(crypto.getRandomValues(new Uint8Array(16)))
+          .map(b => b.toString(16).padStart(2, '0'))
+          .join('');
+      } catch (error) {
+        console.warn("Crypto API not available, using fallback method");
+        return 'user_' + Math.random().toString(36).substring(2, 15) + 
+               Math.random().toString(36).substring(2, 15);
+      }
     }
   </script>
 </body>
